@@ -9,6 +9,15 @@ class Ship:
         self.orientation = orientation
 
 
+    def locationSwitch(location):
+        """
+        Accepts location in Letter-Number (Column, Row) format and converts it into Number-Number (Row, Column) format
+        String -> String
+        """
+        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        return str(location[1] - 1) + alphabet.index(location[0])
+
+
 class Patch:
 
 
