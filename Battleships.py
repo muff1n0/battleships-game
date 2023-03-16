@@ -76,6 +76,7 @@ class Ship:
         None -> None
         """
         if self.location == "":
+            print(1)
             return 
         row_index, column_index = Ship.locationSwitch(self.location)
         self.board.board[row_index][column_index].headShipHere = False
@@ -89,6 +90,7 @@ class Ship:
             ship_span_indexes = [(row_index, column_index + column) for column in range(self.length)]
         for row, column in ship_span_indexes:
             self.board.board[row][column].shipHere = False
+            print(1)
 
 
     def moveShip(self, location): #runs after computer checks if the location is available
@@ -145,4 +147,6 @@ class Game:
 
     p1 = Board()
     p2 = Board()
+
+
 
