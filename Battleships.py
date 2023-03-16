@@ -28,9 +28,10 @@ class Ship:
     alive = True
 
 
-    def __init__(self, length, orientation): #up, down, left, right
+    def __init__(self, length, orientation, board): #up, down, left, right
         self.length = length
         self.orientation = orientation
+        self.board = board
 
 
     @staticmethod
@@ -63,10 +64,31 @@ class Ship:
             if row < 0 or column < 0:
                 return False
             try:
-                ship_span.append(Board.board[row][column])
+                ship_span.append(self.board.board[row][column])
             except IndexError:
                 return False
         return False in [patch.shipHere for patch in ship_span]
+
+
+    def moveShip(self, location): #runs after computer checks if the location is available
+        """
+        After a location is validated for a ship, this function sets the shipHere for all the 
+        patches the ship will occupy to True and sets the headShipHere value for the head ship 
+        to be True
+        String -> None
+        """
+        row_index, column_index = Ship.locationSwitch(location)
+        self.board.board[row_index][column_index].headShipHere = True 
+        if self.orientation == "up": 
+            ship_span_indexes = [(row_index - row, column_index) for row in range(self.length)]
+        elif self.orientation == "down":
+            ship_span_indexes = [(row_index + row, column_index) for row in range(self.length)]
+        elif self.orientation == "left":
+            ship_span_indexes = [(row_index, column_index - column) for column in range(self.length)]
+        elif self.orientation == "right":
+            ship_span_indexes = [(row_index, column_index + column) for column in range(self.length)]
+        for row, column in ship_span_indexes:
+            self.board.board[row][column].shipHere = True
 
 
 class Game:
