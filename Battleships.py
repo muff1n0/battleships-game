@@ -201,8 +201,8 @@ class Board:
 
     def markPatch(self, location):
         """
-        Marks a patch on the board \n 
-        String -> None
+        Marks a patch on the board. Returns False if the user chose a marked location \n 
+        String -> None/False
         """
         row_index, column_index = Ship.locationSwitch(location)
         target = self.board[row_index][column_index]
@@ -210,6 +210,8 @@ class Board:
             target.marked = True
             if target.shipHere:
                 target.deadShip = True
+        else:
+            return False
 
 
 class Game:
