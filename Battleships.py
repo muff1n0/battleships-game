@@ -3,13 +3,40 @@ class Patch:
 
     shipHere = False
     headShipHere = False
-    displayIcons = ("-", "x", "o")
+    deadShip = False
+    marked = False
+
+    
+    def display(self, mode):
+        """Represents a patch object when displayed in a humanreadable version \n
+        String -> String 
+        """
+        if mode == "setup":
+            if self.headShipHere:
+                return "1"
+            elif self.shipHere:
+                return "o"
+            return "-"
+        elif mode == "playing":
+            if self.deadShip:
+                return "x"
+            elif self.shipHere:
+                return "o"
+            elif self.marked:
+                return "+"
+            return "-"
+        elif mode == "hidden":
+            if self.deadShip:
+                return "x"
+            elif self.marked: 
+                return "+"
+            return "-"
 
 
 class Board:
 
 
-    mode = "hidden" # hidden, setup, playing
+    mode = "setup" # hidden, setup, playing
     board = [[Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
@@ -20,6 +47,18 @@ class Board:
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()]]
+
+
+    def display(self):
+        """Displays the entire board in a readable form \n
+        None -> None
+        """
+        print("    A  B  C  D  E  F  G  H  I  J")
+        for row_index, row in enumerate(self.board):
+            if row_index + 1 == 10:
+                print("", 10, "  ".join([patch.display(self.mode) for patch in row]))
+                break
+            print("", row_index + 1, "", "  ".join([patch.display(self.mode) for patch in row]))
 
 
 class Ship:
@@ -76,7 +115,6 @@ class Ship:
         None -> None
         """
         if self.location == "":
-            print(1)
             return 
         row_index, column_index = Ship.locationSwitch(self.location)
         self.board.board[row_index][column_index].headShipHere = False
@@ -90,7 +128,6 @@ class Ship:
             ship_span_indexes = [(row_index, column_index + column) for column in range(self.length)]
         for row, column in ship_span_indexes:
             self.board.board[row][column].shipHere = False
-            print(1)
 
 
     def moveShip(self, location): #runs after computer checks if the location is available
@@ -147,6 +184,4 @@ class Game:
 
     p1 = Board()
     p2 = Board()
-
-
 
