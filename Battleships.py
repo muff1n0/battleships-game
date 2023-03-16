@@ -33,34 +33,6 @@ class Patch:
             return "-"
 
 
-class Board:
-
-
-    mode = "setup" # hidden, setup, playing
-    board = [[Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()]]
-
-
-    def display(self):
-        """Displays the entire board in a readable form \n
-        None -> None
-        """
-        print("    A  B  C  D  E  F  G  H  I  J")
-        for row_index, row in enumerate(self.board):
-            if row_index + 1 == 10:
-                print("", 10, "  ".join([patch.display(self.mode) for patch in row]))
-                break
-            print("", row_index + 1, "", "  ".join([patch.display(self.mode) for patch in row]))
-
-
 class Ship:
     
 
@@ -181,6 +153,10 @@ class Ship:
             
 
     def rotate(self, orientation):
+        """
+        Rotates a ship\n
+        String -> None
+        """
         row_index, column_index = Ship.locationSwitch(self.location)
         self.board.board[row_index][column_index].headShipHere = True 
         if orientation == "up": 
@@ -193,6 +169,47 @@ class Ship:
             ship_span_indexes = [(row_index, column_index + column) for column in range(self.length)]
         for row, column in ship_span_indexes:
             self.board.board[row][column].shipHere = True
+
+
+class Board:
+
+
+    mode = "setup" # hidden, setup, playing
+    board = [[Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()]]
+
+
+    def display(self):
+        """Displays the entire board in a readable form \n
+        None -> None
+        """
+        print("    A  B  C  D  E  F  G  H  I  J")
+        for row_index, row in enumerate(self.board):
+            if row_index + 1 == 10:
+                print("", 10, "  ".join([patch.display(self.mode) for patch in row]))
+                break
+            print("", row_index + 1, "", "  ".join([patch.display(self.mode) for patch in row]))
+
+
+    def markPatch(self, location):
+        """
+        Marks a patch on the board \n 
+        String -> None
+        """
+        row_index, column_index = Ship.locationSwitch(location)
+        target = self.board[row_index][column_index]
+        if not target.marked:
+            target.marked = True
+            if target.shipHere:
+                target.deadShip = True
 
 
 class Game:
