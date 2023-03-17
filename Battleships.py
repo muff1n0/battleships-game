@@ -2,7 +2,7 @@ class Patch:
 
 
     shipHere = False
-    headShipHere = ""
+    headShipHere = False
     deadShip = False
     marked = False
 
@@ -185,6 +185,7 @@ class Board:
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()]]
+    
 
 
     def display(self):
