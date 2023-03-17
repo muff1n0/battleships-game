@@ -151,6 +151,7 @@ class Ship:
         """
         row_index, column_index = Ship.locationSwitch(self.location)
         self.board.board[row_index][column_index].headShipHere = self 
+        self.orientation = orientation
         ship_span_indexes = self.shipSpanRetrieve()
         for row, column in ship_span_indexes:
             self.board.board[row][column].shipHere = True
