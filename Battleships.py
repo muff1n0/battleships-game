@@ -181,6 +181,7 @@ class Board:
             Ship(3, "up"), 
             Ship(3, "up"), 
             Ship(4, "up"))
+    placed = []
 
 
     def display(self):
