@@ -39,7 +39,7 @@ class Ship:
     alive = True
 
 
-    def __init__(self, length, orientation, board, location = ""): #up, down, left, right
+    def __init__(self, length, orientation, board = "", location = ""): #up, down, left, right
         self.length = length
         self.orientation = orientation
         self.board = board
@@ -218,24 +218,5 @@ class Game:
 
 
     p1 = Board()
-    p1Ships = (Ship(1, "up", p1), 
-               Ship(1, "up", p1), 
-               Ship(1, "up", p1), 
-               Ship(1, "up", p1), 
-               Ship(2, "up", p1), 
-               Ship(2, "up", p1), 
-               Ship(2, "up", p1), 
-               Ship(3, "up", p1), 
-               Ship(3, "up", p1), 
-               Ship(4, "up", p1))
     p2 = Board()
-    p2Ships = (Ship(1, "up", p2), 
-               Ship(1, "up", p2), 
-               Ship(1, "up", p2), 
-               Ship(1, "up", p2), 
-               Ship(2, "up", p2), 
-               Ship(2, "up", p2), 
-               Ship(2, "up", p2), 
-               Ship(3, "up", p2), 
-               Ship(3, "up", p2), 
-               Ship(4, "up", p2))    
+
