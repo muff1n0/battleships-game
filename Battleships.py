@@ -112,7 +112,7 @@ class Ship:
         """
         self.location = location
         row_index, column_index = Ship.locationSwitch(location)
-        self.board.board[row_index][column_index].headShipHere = True 
+        self.board.board[row_index][column_index].headShipHere = self 
         if self.orientation == "up": 
             ship_span_indexes = [(row_index - row, column_index) for row in range(self.length)]
         elif self.orientation == "down":
@@ -158,7 +158,7 @@ class Ship:
         String -> None
         """
         row_index, column_index = Ship.locationSwitch(self.location)
-        self.board.board[row_index][column_index].headShipHere = True 
+        self.board.board[row_index][column_index].headShipHere = self 
         if orientation == "up": 
             ship_span_indexes = [(row_index - row, column_index) for row in range(self.length)]
         elif orientation == "down":
