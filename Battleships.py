@@ -185,7 +185,7 @@ class Board:
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()]]
-    ship = (Ship(1, "up"), 
+    ships = (Ship(1, "up"), 
             Ship(1, "up"), 
             Ship(1, "up"), 
             Ship(1, "up"), 
@@ -230,3 +230,12 @@ class Game:
     p1 = Board()
     p2 = Board()
 
+
+    def __init__(self):
+        """
+        Assigns the appropriate boards to the ships of each board
+        """
+        for ship in self.p1.ships:
+            ship.board = self.p1
+        for ship in self.p2.ships:
+            ship.board = self.p2
