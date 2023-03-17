@@ -50,10 +50,14 @@ class Ship:
     def locationSwitch(location):
         """
         Accepts location in Letter-Number (Column, Row) format and converts it into Number-Number (Row, Column) format \n
-        String -> String
+        Returns False if location is not valid \n
+        String -> String/Boolean
         """
-        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        return int(location[1]) - 1, alphabet.index(location[0])
+        alphabet = "ABCDEFGHIJ"
+        try: 
+            return int(location[1]) - 1, alphabet.index(location[0])
+        except:
+            return False
     
 
     def checkLocation(self, location): 
