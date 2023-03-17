@@ -185,7 +185,16 @@ class Board:
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()]]
-    
+    ship = (Ship(1, "up"), 
+            Ship(1, "up"), 
+            Ship(1, "up"), 
+            Ship(1, "up"), 
+            Ship(2, "up"), 
+            Ship(2, "up"), 
+            Ship(2, "up"), 
+            Ship(3, "up"), 
+            Ship(3, "up"), 
+            Ship(4, "up"))
 
 
     def display(self):
