@@ -2,7 +2,7 @@ class Patch:
 
 
     shipHere = False
-    headShipHere = False
+    headShipHere = ""
     deadShip = False
     marked = False
 
@@ -12,8 +12,8 @@ class Patch:
         String -> String 
         """
         if mode == "setup":
-            if self.headShipHere:
-                return "1"
+            if self.headShipHere is Ship:
+                return self.headShipHere.board.ships.index(self.headShipHere)
             elif self.shipHere:
                 return "o"
             return "-"
