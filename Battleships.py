@@ -55,7 +55,7 @@ class Ship:
         """
         alphabet = "ABCDEFGHIJ"
         try: 
-            return int(location[1]) - 1, alphabet.index(location[0])
+            return int(location[1:]) - 1, alphabet.index(location[0])
         except:
             return False
     
@@ -260,7 +260,6 @@ class Board:
                         ship.removeShip()
                         ship.moveShip(location)
                         self.placed.append(ship)
-                        back = True
                         break        
                 elif action == 'r':
                     orientation = input("Which direction do you want the ship to point ('left', 'right', 'up', 'down'), or 'back' to go back: ")
@@ -268,8 +267,8 @@ class Board:
                         orientation = input("Please enter 'left', 'right', 'up', 'down', or 'back': ")
                     if orientation == "back":
                         back = True
-                        break
-                    while ship.location != "" and not ship.checkRotate(orientation):
+                        continue
+                    while ship.location == "" and not ship.checkRotate(orientation):
                         orientation = input("Cannot turn ship this way. Try to turn the ship a different way or 'back': ")
                         while orientation not in ['left', 'right', 'up', 'down', 'back']:
                             orientation = input("Please enter 'left', 'right', 'up', 'down', or 'back': ")
@@ -279,8 +278,9 @@ class Board:
                     if ship.location == "":
                         ship.orientation = orientation
                     else: 
+                        ship.removeShip()
                         ship.rotate(orientation)
-                    break
+                    continue
                 if back:
                     continue
             if back:
@@ -303,8 +303,3 @@ class Game:
         for ship in self.p2.ships:
             ship.board = self.p2
 
-
-g1 = Game()
-b1 = g1.p1
-b1.setup()
-b1.display()
