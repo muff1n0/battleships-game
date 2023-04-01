@@ -12,8 +12,8 @@ class Patch:
         String -> String 
         """
         if mode == "setup":
-            if self.headShipHere:
-                return "1"
+            if isinstance(self.headShipHere, Ship):
+                return str(self.headShipHere.board.ships.index(self.headShipHere))
             elif self.shipHere:
                 return "o"
             return "-"
@@ -39,7 +39,7 @@ class Ship:
     alive = True
 
 
-    def __init__(self, length, orientation, board, location = ""): #up, down, left, right
+    def __init__(self, length, orientation, board = "", location = ""): #up, down, left, right
         self.length = length
         self.orientation = orientation
         self.board = board
@@ -50,28 +50,43 @@ class Ship:
     def locationSwitch(location):
         """
         Accepts location in Letter-Number (Column, Row) format and converts it into Number-Number (Row, Column) format \n
-        String -> String
+        Returns False if location is not valid \n
+        String -> String/Boolean
         """
-        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        return int(location[1]) - 1, alphabet.index(location[0])
+        alphabet = "ABCDEFGHIJ"
+        try: 
+            return int(location[1]) - 1, alphabet.index(location[0])
+        except:
+            return False
     
+
+    def shipSpanRetrieve(self, location = None):
+        """
+        Returns a list of tuples containing the indexes of the board that a ship occupies\n
+        None -> Tuple
+        """   
+        if isinstance(location, str):
+            row_index, column_index = Ship.locationSwitch(location)
+        else:
+            row_index, column_index = Ship.locationSwitch(self.location)
+        if self.orientation == "up": #the tail points up
+            ship_span_indexes = ((row_index - row, column_index) for row in range(self.length))
+        elif self.orientation == "down":
+            ship_span_indexes = ((row_index + row, column_index) for row in range(self.length))
+        elif self.orientation == "left":
+            ship_span_indexes = ((row_index, column_index - column) for column in range(self.length))
+        elif self.orientation == "right":
+            ship_span_indexes = ((row_index, column_index + column) for column in range(self.length))
+        return ship_span_indexes
+
 
     def checkLocation(self, location): 
         """
-        Accepts patch to check if that new location can hold that ship or if that new location exists \n
+        Accepts patch to check if that new location can hold that ship\n
         Patch Object -> Boolean
         """
-        row_index, column_index = Ship.locationSwitch(location)
         ship_span = []
-        if self.orientation == "up": #the tail points up
-            ship_span_indexes = [(row_index - row, column_index) for row in range(self.length)]
-        elif self.orientation == "down":
-            ship_span_indexes = [(row_index + row, column_index) for row in range(self.length)]
-        elif self.orientation == "left":
-            ship_span_indexes = [(row_index, column_index - column) for column in range(self.length)]
-        elif self.orientation == "right":
-            ship_span_indexes = [(row_index, column_index + column) for column in range(self.length)]
-        print(ship_span_indexes)
+        ship_span_indexes = self.shipSpanRetrieve(location = location)
         for row, column in ship_span_indexes:
             if row < 0 or column < 0:
                 return False
@@ -91,14 +106,7 @@ class Ship:
             return 
         row_index, column_index = Ship.locationSwitch(self.location)
         self.board.board[row_index][column_index].headShipHere = False
-        if self.orientation == "up": 
-            ship_span_indexes = [(row_index - row, column_index) for row in range(self.length)]
-        elif self.orientation == "down":
-            ship_span_indexes = [(row_index + row, column_index) for row in range(self.length)]
-        elif self.orientation == "left":
-            ship_span_indexes = [(row_index, column_index - column) for column in range(self.length)]
-        elif self.orientation == "right":
-            ship_span_indexes = [(row_index, column_index + column) for column in range(self.length)]
+        ship_span_indexes = self.shipSpanRetrieve()
         for row, column in ship_span_indexes:
             self.board.board[row][column].shipHere = False
 
@@ -112,15 +120,8 @@ class Ship:
         """
         self.location = location
         row_index, column_index = Ship.locationSwitch(location)
-        self.board.board[row_index][column_index].headShipHere = True 
-        if self.orientation == "up": 
-            ship_span_indexes = [(row_index - row, column_index) for row in range(self.length)]
-        elif self.orientation == "down":
-            ship_span_indexes = [(row_index + row, column_index) for row in range(self.length)]
-        elif self.orientation == "left":
-            ship_span_indexes = [(row_index, column_index - column) for column in range(self.length)]
-        elif self.orientation == "right":
-            ship_span_indexes = [(row_index, column_index + column) for column in range(self.length)]
+        self.board.board[row_index][column_index].headShipHere = self 
+        ship_span_indexes = self.shipSpanRetrieve(location)
         for row, column in ship_span_indexes:
             self.board.board[row][column].shipHere = True
 
@@ -132,16 +133,8 @@ class Ship:
         """
         if orientation == self.orientation:
             return True
-        row_index, column_index = Ship.locationSwitch(self.location)
         ship_span = []
-        if orientation == "up": 
-            ship_span_indexes = [(row_index - row, column_index) for row in range(self.length)]
-        elif orientation == "down":
-            ship_span_indexes = [(row_index + row, column_index) for row in range(self.length)]
-        elif orientation == "left":
-            ship_span_indexes = [(row_index, column_index - column) for column in range(self.length)]
-        elif orientation == "right":
-            ship_span_indexes = [(row_index, column_index + column) for column in range(self.length)]
+        ship_span_indexes = self.shipSpanRetrieve()
         for row, column in ship_span_indexes:
             if row < 0 or column < 0:
                 return False
@@ -158,15 +151,9 @@ class Ship:
         String -> None
         """
         row_index, column_index = Ship.locationSwitch(self.location)
-        self.board.board[row_index][column_index].headShipHere = True 
-        if orientation == "up": 
-            ship_span_indexes = [(row_index - row, column_index) for row in range(self.length)]
-        elif orientation == "down":
-            ship_span_indexes = [(row_index + row, column_index) for row in range(self.length)]
-        elif orientation == "left":
-            ship_span_indexes = [(row_index, column_index - column) for column in range(self.length)]
-        elif orientation == "right":
-            ship_span_indexes = [(row_index, column_index + column) for column in range(self.length)]
+        self.board.board[row_index][column_index].headShipHere = self 
+        self.orientation = orientation
+        ship_span_indexes = self.shipSpanRetrieve()
         for row, column in ship_span_indexes:
             self.board.board[row][column].shipHere = True
 
@@ -185,6 +172,17 @@ class Board:
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
              [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()]]
+    ships = (Ship(1, "up"), 
+            Ship(1, "up"), 
+            Ship(1, "up"), 
+            Ship(1, "up"), 
+            Ship(2, "up"), 
+            Ship(2, "up"), 
+            Ship(2, "up"), 
+            Ship(3, "up"), 
+            Ship(3, "up"), 
+            Ship(4, "up"))
+    placed = []
 
 
     def display(self):
@@ -214,9 +212,92 @@ class Board:
             return False
 
 
+    def setup(self):
+        """
+        Guides user setup for board \n
+        None -> None
+        """
+        print("Board setup: ")
+        while True:
+            back = False
+            ship_id = input("Enter the ID of the ship you want to edit or enter 'exit' to finish: ")
+            if ship_id == "exit" and len(self.placed) == 10: 
+                break
+            elif ship_id == "exit" and len(self.placed) != 10:
+                print("Cannot finish, not all ships have been placed yet. ")
+                continue
+            while ship_id not in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', "exit"]:
+                ship_id = input("Please enter a valid ship ID or 'exit' to finish: ")
+                if ship_id == "exit" and len(self.placed) == 10:
+                    back = True
+                    break
+                elif ship_id == "exit" and not len(self.placed) == 10:
+                    print("Cannot finish, not all ships have been placed yet. ")                
+            if back:
+                break
+            ship = self.ships[int(ship_id)]
+            while True:
+                action = input("Enter 'm' to move or place, 'r' to rotate a ship, 'back' to go back: ")
+                while action not in ['m', 'r', 'back']:
+                    action = input("Please enter a valid option ('m', 'r', 'back'): ")
+                if action == "back":
+                    back = True
+                    break
+                elif action == 'm':
+                    location = input("Which location do you want to move the ship to, or 'back' to go back: ").upper()
+                    while not isinstance(Ship.locationSwitch(location), tuple) or (location != "BACK" and not ship.checkLocation(location)):
+                        location = input("Invalid location or can't be placed here. Please enter a valid location or 'back' to go back: ").upper()
+                    if location == "BACK":
+                        continue
+                    else:
+                        ship.removeShip()
+                        ship.moveShip(location)
+                        self.placed.append(ship)
+                        back = True
+                        break        
+                elif action == 'r':
+                    orientation = input("Which direction do you want the ship to point ('left', 'right', 'up', 'down'), or 'back' to go back: ")
+                    while orientation not in ['left', 'right', 'up', 'down', 'back']:
+                        orientation = input("Please enter 'left', 'right', 'up', 'down', or 'back': ")
+                    if orientation == "back":
+                        back = True
+                        break
+                    while ship.location != "" and not ship.checkRotate(orientation):
+                        orientation = input("Cannot turn ship this way. Try to turn the ship a different way or 'back': ")
+                        while orientation not in ['left', 'right', 'up', 'down', 'back']:
+                            orientation = input("Please enter 'left', 'right', 'up', 'down', or 'back': ")
+                        if orientation == "back":
+                            back = True
+                            break
+                    if ship.location == "":
+                        ship.orientation = orientation
+                    else: 
+                        ship.rotate(orientation)
+                    break
+                if back:
+                    continue
+            if back:
+                continue             
+
+
 class Game:
 
 
     p1 = Board()
     p2 = Board()
 
+
+    def __init__(self):
+        """
+        Assigns the appropriate boards to the ships of each board
+        """
+        for ship in self.p1.ships:
+            ship.board = self.p1
+        for ship in self.p2.ships:
+            ship.board = self.p2
+
+
+g1 = Game()
+b1 = g1.p1
+b1.setup()
+b1.display()
