@@ -85,6 +85,8 @@ class Ship:
         Accepts patch to check if that new location can hold that ship\n
         Patch Object -> Boolean
         """
+        if location == "BACK":
+            return False
         ship_span = []
         ship_span_indexes = self.shipSpanRetrieve(location = location)
         for row, column in ship_span_indexes:
@@ -245,9 +247,14 @@ class Board:
                     break
                 elif action == 'm':
                     location = input("Which location do you want to move the ship to, or 'back' to go back: ").upper()
-                    while not isinstance(Ship.locationSwitch(location), tuple) or (location != "BACK" and not ship.checkLocation(location)):
-                        location = input("Invalid location or can't be placed here. Please enter a valid location or 'back' to go back: ").upper()
                     if location == "BACK":
+                        continue
+                    while not isinstance(Ship.locationSwitch(location), tuple) or not ship.checkLocation(location):
+                        location = input("Invalid location or can't be placed here. Please enter a valid location or 'back' to go back: ").upper()
+                        if location == "BACK":
+                            back = True
+                            break
+                    if back:
                         continue
                     else:
                         ship.removeShip()
