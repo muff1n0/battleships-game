@@ -62,7 +62,7 @@ class Ship:
 
     def shipSpanRetrieve(self, location = None):
         """
-        Returns a list of tuples containing the indexes of the board that a ship occupies\n
+        Returns a generator of tuples containing the indexes of the board that a ship occupies\n
         None -> Tuple
         """   
         if isinstance(location, str):
@@ -80,6 +80,34 @@ class Ship:
         return ship_span_indexes
 
 
+    def neighbors(self, location):
+        """
+        Returns a list of tuples containing the indexes of the neighbors of a ship\n
+        String -> list
+        """
+        neighbors = []
+        for row_index, column_index in self.shipSpanRetrieve(location):
+            if row_index == 0 and column_index == 0:
+                neighbors.extend([(0, 1), (1, 0), (1, 1)])
+            elif row_index == 9 and column_index == 0:
+                neighbors.extend([(8, 0), (8, 1), (9, 1)])
+            elif row_index == 0 and column_index == 9:
+                neighbors.extend([(0, 8), (1, 8), (1, 9)])
+            elif row_index == 9 and column_index == 9:
+                neighbors.extend([(8, 9), (8, 8), (9, 8)])
+            elif column_index == 0:
+                neighbors.extend([(row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index + 1), (row_index + 1, column_index), (row_index + 1, column_index + 1)])    
+            elif row_index == 0:
+                neighbors.extend([(row_index, column_index - 1), (row_index, column_index - 1), (row_index, column_index), (row_index, column_index + 1), (row_index - 1, column_index + 1)])
+            elif column_index == 9:
+                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index, column_index - 1), (row_index + 1, column_index - 1), (row_index + 1, column_index)])
+            elif row_index == 9:
+                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index - 1), (row_index, column_index + 1)])
+            else:
+                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index - 1), (row_index, column_index + 1), (row_index + 1, column_index - 1), (row_index + 1, column_index), (row_index + 1, column_index + 1)])
+        return neighbors
+
+
     def checkLocation(self, location): 
         """
         Accepts patch to check if that new location can hold that ship\n
@@ -88,7 +116,7 @@ class Ship:
         if location == "BACK":
             return False
         ship_span = []
-        ship_span_indexes = self.shipSpanRetrieve(location = location)
+        ship_span_indexes = self.shipSpanRetrieve()
         for row, column in ship_span_indexes:
             if row < 0 or column < 0:
                 return False
@@ -303,3 +331,7 @@ class Game:
         for ship in self.p2.ships:
             ship.board = self.p2
 
+
+g1 = Game()
+g1.p1.setup()
+g1.p1.display()
