@@ -80,13 +80,14 @@ class Ship:
         return ship_span_indexes
 
 
-    def neighbors(self, location):
+    @staticmethod
+    def neighbors(ship_span_indexes):
         """
         Returns a list of tuples containing the indexes of the neighbors of a ship\n
         String -> list
         """
         neighbors = []
-        for row_index, column_index in self.shipSpanRetrieve(location):
+        for row_index, column_index in ship_span_indexes:
             if row_index == 0 and column_index == 0:
                 neighbors.extend([(0, 1), (1, 0), (1, 1)])
             elif row_index == 9 and column_index == 0:
