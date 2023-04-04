@@ -256,6 +256,7 @@ class Board:
             self.display()
             ship_id = input("Enter the ID of the ship you want to edit or enter 'exit' to finish: ")
             if ship_id == "exit" and len(self.placed) == 10: 
+                self.display()
                 break
             elif ship_id == "exit" and len(self.placed) != 10:
                 print("Cannot finish, not all ships have been placed yet. ")
@@ -263,6 +264,7 @@ class Board:
             while ship_id not in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', "exit"]:
                 ship_id = input("Please enter a valid ship ID or 'exit' to finish: ")
                 if ship_id == "exit" and len(self.placed) == 10:
+                    self.display()
                     back = True
                     break
                 elif ship_id == "exit" and not len(self.placed) == 10:
@@ -340,4 +342,3 @@ class Game:
 
 g1 = Game()
 g1.p1.setup()
-g1.p1.display()
