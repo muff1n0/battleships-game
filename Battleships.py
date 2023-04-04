@@ -253,6 +253,7 @@ class Board:
         print("Board setup: ")
         while True:
             back = False
+            self.display()
             ship_id = input("Enter the ID of the ship you want to edit or enter 'exit' to finish: ")
             if ship_id == "exit" and len(self.placed) == 10: 
                 break
@@ -270,7 +271,9 @@ class Board:
                 break
             ship = self.ships[int(ship_id)]
             while True:
+                self.display()
                 action = input("Enter 'm' to move or place, 'r' to rotate a ship, 'back' to go back: ")
+                self.display()
                 while action not in ['m', 'r', 'back']:
                     action = input("Please enter a valid option ('m', 'r', 'back'): ")
                 if action == "back":
@@ -311,6 +314,7 @@ class Board:
                         ship.removeShip()
                         ship.rotate(orientation)
                     continue
+                self.display()
                 if back:
                     continue
             if back:
