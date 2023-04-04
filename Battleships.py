@@ -62,21 +62,21 @@ class Ship:
 
     def shipSpanRetrieve(self, location = None):
         """
-        Returns a generator of tuples containing the indexes of the board that a ship occupies\n
-        None -> Tuple
+        Returns a list of tuples containing the indexes of the board that a ship occupies\n
+        None -> List
         """   
         if isinstance(location, str):
             row_index, column_index = Ship.locationSwitch(location)
         else:
             row_index, column_index = Ship.locationSwitch(self.location)
         if self.orientation == "up": #the tail points up
-            ship_span_indexes = ((row_index - row, column_index) for row in range(self.length))
+            ship_span_indexes = [(row_index - row, column_index) for row in range(self.length)]
         elif self.orientation == "down":
-            ship_span_indexes = ((row_index + row, column_index) for row in range(self.length))
+            ship_span_indexes = [(row_index + row, column_index) for row in range(self.length)]
         elif self.orientation == "left":
-            ship_span_indexes = ((row_index, column_index - column) for column in range(self.length))
+            ship_span_indexes = [(row_index, column_index - column) for column in range(self.length)]
         elif self.orientation == "right":
-            ship_span_indexes = ((row_index, column_index + column) for column in range(self.length))
+            ship_span_indexes = [(row_index, column_index + column) for column in range(self.length)]
         return ship_span_indexes
 
 
@@ -117,16 +117,17 @@ class Ship:
         if location == "BACK":
             return False
         ship_span = []
-        ship_span_indexes = self.shipSpanRetrieve() 
-        neighbors = Ship.neighbors(ship_span_indexes)
-        for row, column in ship_span_indexes + neighbors:
+        ship_span_indexes = self.shipSpanRetrieve(location)
+        neighbors = Ship.neighbors(ship_span_indexes) 
+        deadzone = list(filter(lambda a : a != self, ship_span_indexes)) + neighbors
+        for row, column in deadzone:
             if row < 0 or column < 0:
                 return False
             try:
                 ship_span.append(self.board.board[row][column])
             except IndexError:
                 return False
-        return False in [patch.shipHere for patch in ship_span]
+        return True not in [isinstance(patch.shipHere, Ship) for patch in ship_span]
 
 
     def removeShip(self):
@@ -146,8 +147,8 @@ class Ship:
     def moveShip(self, location): #runs after computer checks if the location is available
         """
         After a location is validated for a ship, this function sets the shipHere for all the \n
-        patches the ship will occupy to True and sets the headShipHere value for the head ship \n
-        to be True
+        patches the ship will occupy to the ship obect and sets the headShipHere value for the head ship \n
+        to be the ship object
         String -> None
         """
         self.location = location
@@ -155,7 +156,7 @@ class Ship:
         self.board.board[row_index][column_index].headShipHere = self 
         ship_span_indexes = self.shipSpanRetrieve(location)
         for row, column in ship_span_indexes:
-            self.board.board[row][column].shipHere = True
+            self.board.board[row][column].shipHere = self
 
 
     def checkRotate(self, orientation):
@@ -279,18 +280,17 @@ class Board:
                     location = input("Which location do you want to move the ship to, or 'back' to go back: ").upper()
                     if location == "BACK":
                         continue
-                    while not isinstance(Ship.locationSwitch(location), tuple) or not ship.checkLocation(location):
+                    while not isinstance(Ship.locationSwitch(location), tuple) or not ship.checkLocation(location=location):
                         location = input("Invalid location or can't be placed here. Please enter a valid location or 'back' to go back: ").upper()
                         if location == "BACK":
                             back = True
                             break
                     if back:
                         continue
-                    else:
-                        ship.removeShip()
-                        ship.moveShip(location)
-                        self.placed.append(ship)
-                        break        
+                    ship.removeShip()
+                    ship.moveShip(location)
+                    self.placed.append(ship)
+                    break        
                 elif action == 'r':
                     orientation = input("Which direction do you want the ship to point ('left', 'right', 'up', 'down'), or 'back' to go back: ")
                     while orientation not in ['left', 'right', 'up', 'down', 'back']:
