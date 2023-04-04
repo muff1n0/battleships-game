@@ -84,7 +84,7 @@ class Ship:
     def neighbors(ship_span_indexes):
         """
         Returns a list of tuples containing the indexes of the neighbors of a ship\n
-        String -> list
+        list -> list
         """
         neighbors = []
         for row_index, column_index in ship_span_indexes:
@@ -112,13 +112,14 @@ class Ship:
     def checkLocation(self, location): 
         """
         Accepts patch to check if that new location can hold that ship\n
-        Patch Object -> Boolean
+        String -> Boolean
         """
         if location == "BACK":
             return False
         ship_span = []
-        ship_span_indexes = self.shipSpanRetrieve()
-        for row, column in ship_span_indexes:
+        ship_span_indexes = self.shipSpanRetrieve() 
+        neighbors = Ship.neighbors(ship_span_indexes)
+        for row, column in ship_span_indexes + neighbors:
             if row < 0 or column < 0:
                 return False
             try:
