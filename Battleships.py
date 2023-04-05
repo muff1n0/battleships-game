@@ -60,7 +60,7 @@ class Ship:
             return False
     
 
-    def shipSpanRetrieve(self, location = None):
+    def shipSpanRetrieve(self, location = None, orientation = None):
         """
         Returns a list of tuples containing the indexes of the board that a ship occupies\n
         None -> List
@@ -69,14 +69,25 @@ class Ship:
             row_index, column_index = Ship.locationSwitch(location)
         else:
             row_index, column_index = Ship.locationSwitch(self.location)
-        if self.orientation == "up": #the tail points up
-            ship_span_indexes = [(row_index - row, column_index) for row in range(self.length)]
-        elif self.orientation == "down":
-            ship_span_indexes = [(row_index + row, column_index) for row in range(self.length)]
-        elif self.orientation == "left":
-            ship_span_indexes = [(row_index, column_index - column) for column in range(self.length)]
-        elif self.orientation == "right":
-            ship_span_indexes = [(row_index, column_index + column) for column in range(self.length)]
+        ship_span_indexes = []
+        if orientation is None: 
+            if self.orientation == "up": #the tail points up
+                ship_span_indexes += [(row_index - row, column_index) for row in range(self.length)]
+            elif self.orientation == "down":
+                ship_span_indexes += [(row_index + row, column_index) for row in range(self.length)]
+            elif self.orientation == "left":
+                ship_span_indexes += [(row_index, column_index - column) for column in range(self.length)]
+            elif self.orientation == "right":
+                ship_span_indexes += [(row_index, column_index + column) for column in range(self.length)]
+        else: 
+            if orientation == "up": #the tail points up
+                ship_span_indexes += [(row_index - row, column_index) for row in range(self.length)]
+            elif orientation == "down":
+                ship_span_indexes += [(row_index + row, column_index) for row in range(self.length)]
+            elif orientation == "left":
+                ship_span_indexes += [(row_index, column_index - column) for column in range(self.length)]
+            elif orientation == "right":
+                ship_span_indexes += [(row_index, column_index + column) for column in range(self.length)]     
         return ship_span_indexes
 
 
@@ -99,7 +110,7 @@ class Ship:
             elif column_index == 0:
                 neighbors.extend([(row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index + 1), (row_index + 1, column_index), (row_index + 1, column_index + 1)])    
             elif row_index == 0:
-                neighbors.extend([(row_index, column_index - 1), (row_index, column_index - 1), (row_index, column_index), (row_index, column_index + 1), (row_index - 1, column_index + 1)])
+                neighbors.extend([(row_index, column_index - 1), (row_index, column_index + 1), (row_index + 1, column_index + 1), (row_index + 1, column_index - 1), (row_index + 1, column_index)])
             elif column_index == 9:
                 neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index, column_index - 1), (row_index + 1, column_index - 1), (row_index + 1, column_index)])
             elif row_index == 9:
@@ -117,7 +128,7 @@ class Ship:
         if location == "BACK":
             return False
         ship_span = []
-        ship_span_indexes = self.shipSpanRetrieve(location)
+        ship_span_indexes = self.shipSpanRetrieve(location = location)
         neighbors = Ship.neighbors(ship_span_indexes) 
         deadzone = list(filter(lambda a : a != self, ship_span_indexes)) + neighbors
         for row, column in deadzone:
@@ -130,7 +141,7 @@ class Ship:
         return True not in [isinstance(patch.shipHere, Ship) for patch in ship_span]
 
 
-    def removeShip(self):
+    def removeShip(self, rotate = False):
         """
         Sets all the patches that the ship occupies to not be occupied anymore. Goes before move and rotate.\n
         None -> None
@@ -139,9 +150,11 @@ class Ship:
             return 
         row_index, column_index = Ship.locationSwitch(self.location)
         self.board.board[row_index][column_index].headShipHere = False
-        ship_span_indexes = self.shipSpanRetrieve()
+        ship_span_indexes = self.shipSpanRetrieve(location = self.location)
         for row, column in ship_span_indexes:
             self.board.board[row][column].shipHere = False
+        if not rotate:
+            self.location = ""
 
 
     def moveShip(self, location): #runs after computer checks if the location is available
@@ -154,7 +167,7 @@ class Ship:
         self.location = location
         row_index, column_index = Ship.locationSwitch(location)
         self.board.board[row_index][column_index].headShipHere = self 
-        ship_span_indexes = self.shipSpanRetrieve(location)
+        ship_span_indexes = self.shipSpanRetrieve(location = location)
         for row, column in ship_span_indexes:
             self.board.board[row][column].shipHere = self
 
@@ -167,7 +180,7 @@ class Ship:
         if orientation == self.orientation:
             return True
         ship_span = []
-        ship_span_indexes = self.shipSpanRetrieve()
+        ship_span_indexes = self.shipSpanRetrieve(orientation = orientation)
         for row, column in ship_span_indexes:
             if row < 0 or column < 0:
                 return False
@@ -186,9 +199,9 @@ class Ship:
         row_index, column_index = Ship.locationSwitch(self.location)
         self.board.board[row_index][column_index].headShipHere = self 
         self.orientation = orientation
-        ship_span_indexes = self.shipSpanRetrieve()
+        ship_span_indexes = self.shipSpanRetrieve(orientation = orientation)
         for row, column in ship_span_indexes:
-            self.board.board[row][column].shipHere = True
+            self.board.board[row][column].shipHere = self
 
 
 class Board:
@@ -285,6 +298,8 @@ class Board:
                     location = input("Which location do you want to move the ship to, or 'back' to go back: ").upper()
                     if location == "BACK":
                         continue
+                    if ship.location != "":
+                        ship.removeShip()
                     while not isinstance(Ship.locationSwitch(location), tuple) or not ship.checkLocation(location=location):
                         location = input("Invalid location or can't be placed here. Please enter a valid location or 'back' to go back: ").upper()
                         if location == "BACK":
@@ -303,19 +318,21 @@ class Board:
                     if orientation == "back":
                         back = True
                         continue
-                    while ship.location == "" and not ship.checkRotate(orientation):
+                    while ship.location != "" and not ship.checkRotate(orientation):
                         orientation = input("Cannot turn ship this way. Try to turn the ship a different way or 'back': ")
                         while orientation not in ['left', 'right', 'up', 'down', 'back']:
                             orientation = input("Please enter 'left', 'right', 'up', 'down', or 'back': ")
                         if orientation == "back":
                             back = True
                             break
+                    if back:
+                        break
                     if ship.location == "":
                         ship.orientation = orientation
                     else: 
-                        ship.removeShip()
+                        ship.removeShip(rotate = True)
                         ship.rotate(orientation)
-                    continue
+                    break
                 self.display()
                 if back:
                     continue
