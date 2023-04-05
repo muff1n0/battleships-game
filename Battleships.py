@@ -1,3 +1,6 @@
+import os
+
+
 class Patch:
 
 
@@ -34,9 +37,6 @@ class Patch:
 
 
 class Ship:
-    
-
-    alive = True
 
 
     def __init__(self, length, orientation, board = "", location = ""): #up, down, left, right
@@ -44,6 +44,7 @@ class Ship:
         self.orientation = orientation
         self.board = board
         self.location = location
+        self.alive = True
 
 
     @staticmethod
@@ -207,28 +208,29 @@ class Ship:
 class Board:
 
 
-    mode = "setup" # hidden, setup, playing
-    board = [[Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
-             [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()]]
-    ships = (Ship(1, "up"), 
-            Ship(1, "up"), 
-            Ship(1, "up"), 
-            Ship(1, "up"), 
-            Ship(2, "up"), 
-            Ship(2, "up"), 
-            Ship(2, "up"), 
-            Ship(3, "up"), 
-            Ship(3, "up"), 
-            Ship(4, "up"))
-    placed = []
+    def __init__(self):
+        self.mode = "setup" # hidden, setup, playing
+        self.board = [[Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+                [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+                [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+                [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+                [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+                [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+                [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+                [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+                [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()], 
+                [Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch(), Patch()]]
+        self.ships = (Ship(1, "up"), 
+                Ship(1, "up"), 
+                Ship(1, "up"), 
+                Ship(1, "up"), 
+                Ship(2, "up"), 
+                Ship(2, "up"), 
+                Ship(2, "up"), 
+                Ship(3, "up"), 
+                Ship(3, "up"), 
+                Ship(4, "up"))
+        self.placed = []
 
 
     def display(self):
@@ -269,7 +271,6 @@ class Board:
             self.display()
             ship_id = input("Enter the ID of the ship you want to edit or enter 'exit' to finish: ")
             if ship_id == "exit" and len(self.placed) == 10: 
-                self.display()
                 break
             elif ship_id == "exit" and len(self.placed) != 10:
                 print("Cannot finish, not all ships have been placed yet. ")
@@ -357,5 +358,11 @@ class Game:
             ship.board = self.p2
 
 
+    def setupManager(self):
+        self.p1.setup()
+        os.system('clear')
+        self.p2.setup()
+
+
 g1 = Game()
-g1.p1.setup()
+g1.setupManager()
