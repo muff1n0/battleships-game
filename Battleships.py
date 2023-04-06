@@ -60,6 +60,35 @@ class Ship:
         except:
             return False
     
+    
+    @staticmethod
+    def neighbors(ship_span_indexes):
+        """
+        Returns a list of tuples containing the indexes of the neighbors of a ship\n
+        list -> list
+        """
+        neighbors = []
+        for row_index, column_index in ship_span_indexes:
+            if row_index == 0 and column_index == 0:
+                neighbors.extend([(0, 1), (1, 0), (1, 1)])
+            elif row_index == 9 and column_index == 0:
+                neighbors.extend([(8, 0), (8, 1), (9, 1)])
+            elif row_index == 0 and column_index == 9:
+                neighbors.extend([(0, 8), (1, 8), (1, 9)])
+            elif row_index == 9 and column_index == 9:
+                neighbors.extend([(8, 9), (8, 8), (9, 8)])
+            elif column_index == 0:
+                neighbors.extend([(row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index + 1), (row_index + 1, column_index), (row_index + 1, column_index + 1)])    
+            elif row_index == 0:
+                neighbors.extend([(row_index, column_index - 1), (row_index, column_index + 1), (row_index + 1, column_index + 1), (row_index + 1, column_index - 1), (row_index + 1, column_index)])
+            elif column_index == 9:
+                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index, column_index - 1), (row_index + 1, column_index - 1), (row_index + 1, column_index)])
+            elif row_index == 9:
+                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index - 1), (row_index, column_index + 1)])
+            else:
+                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index - 1), (row_index, column_index + 1), (row_index + 1, column_index - 1), (row_index + 1, column_index), (row_index + 1, column_index + 1)])
+        return neighbors
+
 
     def shipSpanRetrieve(self, location = None, orientation = None):
         """
@@ -90,35 +119,6 @@ class Ship:
             elif orientation == "right":
                 ship_span_indexes += [(row_index, column_index + column) for column in range(self.length)]     
         return ship_span_indexes
-
-
-    @staticmethod
-    def neighbors(ship_span_indexes):
-        """
-        Returns a list of tuples containing the indexes of the neighbors of a ship\n
-        list -> list
-        """
-        neighbors = []
-        for row_index, column_index in ship_span_indexes:
-            if row_index == 0 and column_index == 0:
-                neighbors.extend([(0, 1), (1, 0), (1, 1)])
-            elif row_index == 9 and column_index == 0:
-                neighbors.extend([(8, 0), (8, 1), (9, 1)])
-            elif row_index == 0 and column_index == 9:
-                neighbors.extend([(0, 8), (1, 8), (1, 9)])
-            elif row_index == 9 and column_index == 9:
-                neighbors.extend([(8, 9), (8, 8), (9, 8)])
-            elif column_index == 0:
-                neighbors.extend([(row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index + 1), (row_index + 1, column_index), (row_index + 1, column_index + 1)])    
-            elif row_index == 0:
-                neighbors.extend([(row_index, column_index - 1), (row_index, column_index + 1), (row_index + 1, column_index + 1), (row_index + 1, column_index - 1), (row_index + 1, column_index)])
-            elif column_index == 9:
-                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index, column_index - 1), (row_index + 1, column_index - 1), (row_index + 1, column_index)])
-            elif row_index == 9:
-                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index - 1), (row_index, column_index + 1)])
-            else:
-                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index - 1), (row_index, column_index + 1), (row_index + 1, column_index - 1), (row_index + 1, column_index), (row_index + 1, column_index + 1)])
-        return neighbors
 
 
     def checkLocation(self, location): 
@@ -231,6 +231,16 @@ class Board:
                 Ship(3, "up"), 
                 Ship(4, "up"))
         self.placed = {}
+
+
+    def isSunken(self, location):
+        """
+        Returns if all a ship's patches have been marked\n
+        String -> Boolean
+        """
+        row_index, column_index = Ship.locationSwitch(location)
+        ship = self.board[row_index][column_index].shipHere
+        return False not in [self.board[row][index].deadShip for row, index in ship.shipSpanRetrieve()]
 
 
     def display(self):
@@ -393,7 +403,6 @@ class Game:
         """
         self.setupManager()
         while self.p1.countDead() != 20 and self.p2.countDead() != 20:
-            print(self.p1.countDead())
             confirm_1 = input("Player 1 ready (enter anything): ")
             self.p2.mode = "hidden"
             self.p1.mode = "playing"
@@ -446,7 +455,7 @@ class Game:
                 self.p2.display()
                 print()
                 row, column = Ship.locationSwitch(location)
-                while self.p1.board[row][column].shipHere and self.p1.countDead() != 20:
+                while self.p1.board[row][column].shipHere and self.p1.countDead() != 20:     
                     os.system('cls')
                     self.p1.display()
                     print()
