@@ -338,7 +338,18 @@ class Board:
                 if back:
                     continue
             if back:
-                continue             
+                continue
+
+
+    def countDead(self):
+        """
+        Returns the number of dead ships in the board. \n
+        None -> int 
+        """         
+        count = 0 
+        for row in self.board:
+            count += len(list(filter(lambda a : a.deadShip, row)))
+        return count
 
 
 class Game:
