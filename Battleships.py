@@ -359,9 +359,12 @@ class Game:
 
 
     def setupManager(self):
+        print("Player one setup: ")
         self.p1.setup()
         os.system('clear')
+        print("Player two setup: ")
         self.p2.setup()
+        os.system('clear')
 
 
 g1 = Game()
