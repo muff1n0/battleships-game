@@ -230,7 +230,7 @@ class Board:
                 Ship(3, "up"), 
                 Ship(3, "up"), 
                 Ship(4, "up"))
-        self.placed = []
+        self.placed = {}
 
 
     def display(self):
@@ -248,7 +248,7 @@ class Board:
     def markPatch(self, location):
         """
         Marks a patch on the board. Returns False if the user chose a marked location \n 
-        String -> None/False
+        String -> Bool
         """
         row_index, column_index = Ship.locationSwitch(location)
         target = self.board[row_index][column_index]
@@ -256,6 +256,7 @@ class Board:
             target.marked = True
             if target.shipHere:
                 target.deadShip = True
+            return True
         else:
             return False
 
@@ -265,11 +266,13 @@ class Board:
         Guides user setup for board \n
         None -> None
         """
-        print("Board setup: ")
         while True:
+            print("Board setup: ")
             back = False
             self.display()
             ship_id = input("Enter the ID of the ship you want to edit or enter 'exit' to finish: ")
+            self.placed = set(self.placed)
+            self.placed = list(self.placed) 
             if ship_id == "exit" and len(self.placed) == 10: 
                 break
             elif ship_id == "exit" and len(self.placed) != 10:
@@ -339,6 +342,7 @@ class Board:
                     continue
             if back:
                 continue
+            os.system('cls')
 
 
     def countDead(self):
@@ -370,13 +374,104 @@ class Game:
 
 
     def setupManager(self):
+        """
+        Initiates ship setup\n
+        None -> None
+        """
         print("Player one setup: ")
         self.p1.setup()
-        os.system('clear')
+        os.system('cls')
         print("Player two setup: ")
         self.p2.setup()
-        os.system('clear')
+        os.system('cls')
 
+
+    def play(self):
+        """
+        Plays the game\n
+        None -> None
+        """
+        self.setupManager()
+        while self.p1.countDead() != 20 and self.p2.countDead() != 20:
+            print(self.p1.countDead())
+            confirm_1 = input("Player 1 ready (enter anything): ")
+            self.p2.mode = "hidden"
+            self.p1.mode = "playing"
+            self.p2.display()
+            print()
+            self.p1.display()
+            print()
+            location = input("Location to attack: ").upper()
+            while Ship.locationSwitch(location) == False or (isinstance(Ship.locationSwitch(location), tuple) and not self.p2.markPatch(location)):
+                location = input("Invalid location or location already marked, choose another location: ").upper()
+            self.p2.markPatch(location)
+            self.p2.display()
+            print()
+            self.p1.display()
+            print()
+            row, column = Ship.locationSwitch(location)
+            while self.p2.board[row][column].shipHere and self.p2.countDead() != 20: 
+                os.system('cls')
+                self.p2.display()
+                print()
+                self.p1.display()
+                print()
+                location = input("Location to attack: ").upper()
+                while Ship.locationSwitch(location) == False or (isinstance(Ship.locationSwitch(location), tuple) and not self.p2.markPatch(location)):
+                    location = input("Invalid location or location already marked, choose another location: ").upper()
+                self.p2.markPatch(location)
+                self.p2.display()
+                print()
+                self.p1.display()
+                print()
+                row, column = Ship.locationSwitch(location)
+            if self.p2.countDead() != 20:
+                done = input("Player 1 done (enter anything): ")
+            os.system('cls')
+            if self.p2.countDead() != 20:
+                confirm_2 = input("Player 2 ready (enter anything): ")
+                self.p1.mode = "hidden"
+                self.p2.mode = "playing"
+                self.p1.display()
+                print()
+                self.p2.display()
+                print()
+                location = input("Location to attack: ").upper()
+                while Ship.locationSwitch(location) == False or (isinstance(Ship.locationSwitch(location), tuple) and not self.p1.markPatch(location)):
+                    location = input("Invalid location or location already marked, choose another location: ").upper()
+                os.system('cls')
+                self.p1.markPatch(location)
+                self.p1.display()
+                print()
+                self.p2.display()
+                print()
+                row, column = Ship.locationSwitch(location)
+                while self.p1.board[row][column].shipHere and self.p1.countDead() != 20:
+                    os.system('cls')
+                    self.p1.display()
+                    print()
+                    self.p2.display()
+                    print()
+                    location = input("Location to attack: ").upper()
+                    while Ship.locationSwitch(location) == False or (isinstance(Ship.locationSwitch(location), tuple) and not self.p1.markPatch(location)):
+                        location = input("Invalid location or location already marked, choose another location: ").upper()
+                    os.system('cls')
+                    self.p1.markPatch(location)
+                    self.p1.display()
+                    print()
+                    self.p2.display()
+                    print()
+                    row, column = Ship.locationSwitch(location)
+                if self.p1.countDead() != 20:
+                    done = input("Player 2 done (enter anything): ")
+                os.system('cls')
+        if self.p1.countDead() == 20:
+            print("Player two wins!")
+        else:
+            print("Player one wins!")
+            
 
 g1 = Game()
-g1.setupManager()
+g1.play()
+
+
