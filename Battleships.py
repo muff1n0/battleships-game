@@ -269,8 +269,25 @@ class Board:
             return True
         else:
             return False
+        
 
-
+    def markNeighbors(self, location):
+        """
+        Marks all the ships around a ship\n
+        String -> None
+        """
+        row_index, column_index = Ship.locationSwitch(location)
+        ship = self.board[row_index][column_index].shipHere
+        ship_span_indexes = ship.shipSpanRetrieve()
+        neighbors = Ship.neighbors(ship_span_indexes)
+        alphabet = "ABCDEFGHIJ"
+        neighbors_locations = []
+        for row, column in neighbors:
+            neighbors_locations.append(alphabet[column] + str(row + 1))
+        for location in neighbors_locations:
+            self.markPatch(location)
+            
+                    
     def setup(self):
         """
         Guides user setup for board \n
@@ -421,6 +438,8 @@ class Game:
             row, column = Ship.locationSwitch(location)
             while self.p2.board[row][column].shipHere and self.p2.countDead() != 20: 
                 os.system('cls')
+                if self.p2.isSunken(location): 
+                    self.p2.markNeighbors(location)
                 self.p2.display()
                 print()
                 self.p1.display()
@@ -457,6 +476,8 @@ class Game:
                 row, column = Ship.locationSwitch(location)
                 while self.p1.board[row][column].shipHere and self.p1.countDead() != 20:     
                     os.system('cls')
+                    if self.p1.isSunken(location): 
+                        self.p1.markNeighbors(location)
                     self.p1.display()
                     print()
                     self.p2.display()
@@ -482,5 +503,6 @@ class Game:
 
 g1 = Game()
 g1.play()
+
 
 
