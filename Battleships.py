@@ -243,6 +243,19 @@ class Board:
         return False not in [self.board[row][index].deadShip for row, index in ship.shipSpanRetrieve()]
 
 
+    def showNotPlaced(self):
+        """
+        Prints out the ships that the user has not placed yet\n
+        None -> None
+        """
+        print("Ships not placed:")
+        not_placed = [ship for ship in self.ships if ship not in self.placed]
+        ship_string = ""
+        for ship in not_placed:
+            ship_string += f"ID: {self.ships.index(ship)} Length: {ship.length} Orientation: {ship.orientation}\n"
+        print(ship_string)
+
+
     def display(self):
         """Displays the entire board in a readable form \n
         None -> None
@@ -297,6 +310,7 @@ class Board:
             print("Board setup: ")
             back = False
             self.display()
+            self.showNotPlaced()
             ship_id = input("Enter the ID of the ship you want to edit or enter 'exit' to finish: ")
             self.placed = set(self.placed)
             self.placed = list(self.placed) 
