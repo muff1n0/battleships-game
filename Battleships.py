@@ -19,7 +19,6 @@ class Patch:
                 return str(self.headShipHere.board.ships.index(self.headShipHere))
             elif self.shipHere:
                 return "o"
-            return "-"
         elif mode == "playing":
             if self.deadShip:
                 return "x"
@@ -27,13 +26,19 @@ class Patch:
                 return "o"
             elif self.marked:
                 return "+"
-            return "-"
         elif mode == "hidden":
             if self.deadShip:
                 return "x"
             elif self.marked: 
                 return "+"
-            return "-"
+        elif mode == "finished":
+            if self.deadShip: 
+                return "x"
+            elif self.marked:
+                return "+"
+            elif self.shipHere:
+                return "o"
+        return "-"
 
 
 class Ship:
@@ -511,8 +516,13 @@ class Game:
                 os.system('cls')
         if self.p1.countDead() == 20:
             print("Player two wins!")
+
         else:
             print("Player one wins!")
+        self.p1.mode = "finished"
+        self.p2.mode = "finished"
+        self.p1.display()
+        self.p2.display() 
             
 
 g1 = Game()
