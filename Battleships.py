@@ -16,35 +16,35 @@ class Patch:
         """
         if mode == "setup":
             if isinstance(self.headShipHere, Ship):
-                return str(self.headShipHere.board.ships.index(self.headShipHere))
+                return '\033[45m' + str(self.headShipHere.board.ships.index(self.headShipHere)) + '\033[00m'
             elif self.shipHere:
-                return "o"
+                return "\033[44mo\033[00m"
         elif mode == "playing":
             if self.deadShip:
-                return "x"
+                return "\033[41mx\033[00m"
             elif self.shipHere:
-                return "o"
+                return "\033[44mo\033[00m"
             elif self.marked:
                 return "+"
         elif mode == "hidden":
             if self.deadShip:
-                return "x"
+                return "\033[41mx\033[00m"
             elif self.marked: 
                 return "+"
         elif mode == "finished":
             if self.deadShip: 
-                return "x"
+                return "\033[41mx\033[00m"
             elif self.marked:
                 return "+"
             elif self.shipHere:
-                return "o"
+                return "\033[44mo\033[00m"
         return "-"
 
 
 class Ship:
 
 
-    def __init__(self, length, orientation, board = "", location = ""): #up, down, left, right
+    def __init__(self, length, orientation, board = "", location = ""): 
         self.length = length
         self.orientation = orientation
         self.board = board
@@ -106,7 +106,7 @@ class Ship:
             row_index, column_index = Ship.locationSwitch(self.location)
         ship_span_indexes = []
         if orientation is None: 
-            if self.orientation == "up": #the tail points up
+            if self.orientation == "up": 
                 ship_span_indexes += [(row_index - row, column_index) for row in range(self.length)]
             elif self.orientation == "down":
                 ship_span_indexes += [(row_index + row, column_index) for row in range(self.length)]
@@ -115,7 +115,7 @@ class Ship:
             elif self.orientation == "right":
                 ship_span_indexes += [(row_index, column_index + column) for column in range(self.length)]
         else: 
-            if orientation == "up": #the tail points up
+            if orientation == "up": 
                 ship_span_indexes += [(row_index - row, column_index) for row in range(self.length)]
             elif orientation == "down":
                 ship_span_indexes += [(row_index + row, column_index) for row in range(self.length)]
@@ -527,6 +527,3 @@ class Game:
 
 g1 = Game()
 g1.play()
-
-
-
