@@ -19,7 +19,6 @@ class Patch:
                 return str(self.headShipHere.board.ships.index(self.headShipHere))
             elif self.shipHere:
                 return "o"
-            return "-"
         elif mode == "playing":
             if self.deadShip:
                 return "x"
@@ -27,13 +26,19 @@ class Patch:
                 return "o"
             elif self.marked:
                 return "+"
-            return "-"
         elif mode == "hidden":
             if self.deadShip:
                 return "x"
             elif self.marked: 
                 return "+"
-            return "-"
+        elif mode == "finished":
+            if self.deadShip: 
+                return "x"
+            elif self.marked:
+                return "+"
+            elif self.shipHere:
+                return "o"
+        return "-"
 
 
 class Ship:
@@ -60,6 +65,35 @@ class Ship:
         except:
             return False
     
+    
+    @staticmethod
+    def neighbors(ship_span_indexes):
+        """
+        Returns a list of tuples containing the indexes of the neighbors of a ship\n
+        list -> list
+        """
+        neighbors = []
+        for row_index, column_index in ship_span_indexes:
+            if row_index == 0 and column_index == 0:
+                neighbors.extend([(0, 1), (1, 0), (1, 1)])
+            elif row_index == 9 and column_index == 0:
+                neighbors.extend([(8, 0), (8, 1), (9, 1)])
+            elif row_index == 0 and column_index == 9:
+                neighbors.extend([(0, 8), (1, 8), (1, 9)])
+            elif row_index == 9 and column_index == 9:
+                neighbors.extend([(8, 9), (8, 8), (9, 8)])
+            elif column_index == 0:
+                neighbors.extend([(row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index + 1), (row_index + 1, column_index), (row_index + 1, column_index + 1)])    
+            elif row_index == 0:
+                neighbors.extend([(row_index, column_index - 1), (row_index, column_index + 1), (row_index + 1, column_index + 1), (row_index + 1, column_index - 1), (row_index + 1, column_index)])
+            elif column_index == 9:
+                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index, column_index - 1), (row_index + 1, column_index - 1), (row_index + 1, column_index)])
+            elif row_index == 9:
+                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index - 1), (row_index, column_index + 1)])
+            else:
+                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index - 1), (row_index, column_index + 1), (row_index + 1, column_index - 1), (row_index + 1, column_index), (row_index + 1, column_index + 1)])
+        return neighbors
+
 
     def shipSpanRetrieve(self, location = None, orientation = None):
         """
@@ -90,35 +124,6 @@ class Ship:
             elif orientation == "right":
                 ship_span_indexes += [(row_index, column_index + column) for column in range(self.length)]     
         return ship_span_indexes
-
-
-    @staticmethod
-    def neighbors(ship_span_indexes):
-        """
-        Returns a list of tuples containing the indexes of the neighbors of a ship\n
-        list -> list
-        """
-        neighbors = []
-        for row_index, column_index in ship_span_indexes:
-            if row_index == 0 and column_index == 0:
-                neighbors.extend([(0, 1), (1, 0), (1, 1)])
-            elif row_index == 9 and column_index == 0:
-                neighbors.extend([(8, 0), (8, 1), (9, 1)])
-            elif row_index == 0 and column_index == 9:
-                neighbors.extend([(0, 8), (1, 8), (1, 9)])
-            elif row_index == 9 and column_index == 9:
-                neighbors.extend([(8, 9), (8, 8), (9, 8)])
-            elif column_index == 0:
-                neighbors.extend([(row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index + 1), (row_index + 1, column_index), (row_index + 1, column_index + 1)])    
-            elif row_index == 0:
-                neighbors.extend([(row_index, column_index - 1), (row_index, column_index + 1), (row_index + 1, column_index + 1), (row_index + 1, column_index - 1), (row_index + 1, column_index)])
-            elif column_index == 9:
-                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index, column_index - 1), (row_index + 1, column_index - 1), (row_index + 1, column_index)])
-            elif row_index == 9:
-                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index - 1), (row_index, column_index + 1)])
-            else:
-                neighbors.extend([(row_index - 1, column_index-1), (row_index - 1, column_index), (row_index - 1, column_index + 1), (row_index, column_index - 1), (row_index, column_index + 1), (row_index + 1, column_index - 1), (row_index + 1, column_index), (row_index + 1, column_index + 1)])
-        return neighbors
 
 
     def checkLocation(self, location): 
@@ -230,7 +235,30 @@ class Board:
                 Ship(3, "up"), 
                 Ship(3, "up"), 
                 Ship(4, "up"))
-        self.placed = []
+        self.placed = {}
+
+
+    def isSunken(self, location):
+        """
+        Returns if all a ship's patches have been marked\n
+        String -> Boolean
+        """
+        row_index, column_index = Ship.locationSwitch(location)
+        ship = self.board[row_index][column_index].shipHere
+        return False not in [self.board[row][index].deadShip for row, index in ship.shipSpanRetrieve()]
+
+
+    def showNotPlaced(self):
+        """
+        Prints out the ships that the user has not placed yet\n
+        None -> None
+        """
+        print("Ships not placed:")
+        not_placed = [ship for ship in self.ships if ship not in self.placed]
+        ship_string = ""
+        for ship in not_placed:
+            ship_string += f"ID: {self.ships.index(ship)} Length: {ship.length} Orientation: {ship.orientation}\n"
+        print(ship_string)
 
 
     def display(self):
@@ -248,7 +276,7 @@ class Board:
     def markPatch(self, location):
         """
         Marks a patch on the board. Returns False if the user chose a marked location \n 
-        String -> None/False
+        String -> Bool
         """
         row_index, column_index = Ship.locationSwitch(location)
         target = self.board[row_index][column_index]
@@ -256,20 +284,41 @@ class Board:
             target.marked = True
             if target.shipHere:
                 target.deadShip = True
+            return True
         else:
             return False
+        
 
-
+    def markNeighbors(self, location):
+        """
+        Marks all the ships around a ship\n
+        String -> None
+        """
+        row_index, column_index = Ship.locationSwitch(location)
+        ship = self.board[row_index][column_index].shipHere
+        ship_span_indexes = ship.shipSpanRetrieve()
+        neighbors = Ship.neighbors(ship_span_indexes)
+        alphabet = "ABCDEFGHIJ"
+        neighbors_locations = []
+        for row, column in neighbors:
+            neighbors_locations.append(alphabet[column] + str(row + 1))
+        for location in neighbors_locations:
+            self.markPatch(location)
+            
+                    
     def setup(self):
         """
         Guides user setup for board \n
         None -> None
         """
-        print("Board setup: ")
         while True:
+            print("Board setup: ")
             back = False
             self.display()
+            self.showNotPlaced()
             ship_id = input("Enter the ID of the ship you want to edit or enter 'exit' to finish: ")
+            self.placed = set(self.placed)
+            self.placed = list(self.placed) 
             if ship_id == "exit" and len(self.placed) == 10: 
                 break
             elif ship_id == "exit" and len(self.placed) != 10:
@@ -338,7 +387,19 @@ class Board:
                 if back:
                     continue
             if back:
-                continue             
+                continue
+            os.system('cls')
+
+
+    def countDead(self):
+        """
+        Returns the number of dead ships in the board. \n
+        None -> int 
+        """         
+        count = 0 
+        for row in self.board:
+            count += len(list(filter(lambda a : a.deadShip, row)))
+        return count
 
 
 class Game:
@@ -359,10 +420,113 @@ class Game:
 
 
     def setupManager(self):
+        """
+        Initiates ship setup\n
+        None -> None
+        """
+        print("Player one setup: ")
         self.p1.setup()
-        os.system('clear')
+        os.system('cls')
+        print("Player two setup: ")
         self.p2.setup()
+        os.system('cls')
 
+
+    def play(self):
+        """
+        Plays the game\n
+        None -> None
+        """
+        self.setupManager()
+        while self.p1.countDead() != 20 and self.p2.countDead() != 20:
+            confirm_1 = input("Player 1 ready (enter anything): ")
+            self.p2.mode = "hidden"
+            self.p1.mode = "playing"
+            self.p2.display()
+            print()
+            self.p1.display()
+            print()
+            location = input("Location to attack: ").upper()
+            while Ship.locationSwitch(location) == False or (isinstance(Ship.locationSwitch(location), tuple) and not self.p2.markPatch(location)):
+                location = input("Invalid location or location already marked, choose another location: ").upper()
+            self.p2.markPatch(location)
+            self.p2.display()
+            print()
+            self.p1.display()
+            print()
+            row, column = Ship.locationSwitch(location)
+            while self.p2.board[row][column].shipHere and self.p2.countDead() != 20: 
+                os.system('cls')
+                if self.p2.isSunken(location): 
+                    self.p2.markNeighbors(location)
+                self.p2.display()
+                print()
+                self.p1.display()
+                print()
+                location = input("Location to attack: ").upper()
+                while Ship.locationSwitch(location) == False or (isinstance(Ship.locationSwitch(location), tuple) and not self.p2.markPatch(location)):
+                    location = input("Invalid location or location already marked, choose another location: ").upper()
+                self.p2.markPatch(location)
+                self.p2.display()
+                print()
+                self.p1.display()
+                print()
+                row, column = Ship.locationSwitch(location)
+            if self.p2.countDead() != 20:
+                done = input("Player 1 done (enter anything): ")
+            os.system('cls')
+            if self.p2.countDead() != 20:
+                confirm_2 = input("Player 2 ready (enter anything): ")
+                self.p1.mode = "hidden"
+                self.p2.mode = "playing"
+                self.p1.display()
+                print()
+                self.p2.display()
+                print()
+                location = input("Location to attack: ").upper()
+                while Ship.locationSwitch(location) == False or (isinstance(Ship.locationSwitch(location), tuple) and not self.p1.markPatch(location)):
+                    location = input("Invalid location or location already marked, choose another location: ").upper()
+                os.system('cls')
+                self.p1.markPatch(location)
+                self.p1.display()
+                print()
+                self.p2.display()
+                print()
+                row, column = Ship.locationSwitch(location)
+                while self.p1.board[row][column].shipHere and self.p1.countDead() != 20:     
+                    os.system('cls')
+                    if self.p1.isSunken(location): 
+                        self.p1.markNeighbors(location)
+                    self.p1.display()
+                    print()
+                    self.p2.display()
+                    print()
+                    location = input("Location to attack: ").upper()
+                    while Ship.locationSwitch(location) == False or (isinstance(Ship.locationSwitch(location), tuple) and not self.p1.markPatch(location)):
+                        location = input("Invalid location or location already marked, choose another location: ").upper()
+                    os.system('cls')
+                    self.p1.markPatch(location)
+                    self.p1.display()
+                    print()
+                    self.p2.display()
+                    print()
+                    row, column = Ship.locationSwitch(location)
+                if self.p1.countDead() != 20:
+                    done = input("Player 2 done (enter anything): ")
+                os.system('cls')
+        if self.p1.countDead() == 20:
+            print("Player two wins!")
+
+        else:
+            print("Player one wins!")
+        self.p1.mode = "finished"
+        self.p2.mode = "finished"
+        self.p1.display()
+        self.p2.display() 
+            
 
 g1 = Game()
-g1.setupManager()
+g1.play()
+
+
+
