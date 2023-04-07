@@ -331,7 +331,8 @@ class Board:
                     back = True
                     break
                 elif ship_id == "exit" and not len(self.placed) == 10:
-                    print("Cannot finish, not all ships have been placed yet. ")                
+                    print("Cannot finish, not all ships have been placed yet. ")      
+                    ship_id = None          
             if back:
                 break
             ship = self.ships[int(ship_id)]
@@ -522,6 +523,7 @@ class Game:
         self.p1.mode = "finished"
         self.p2.mode = "finished"
         self.p1.display()
+        print()
         self.p2.display() 
             
 
